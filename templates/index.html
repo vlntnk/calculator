@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="static/index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;1,9..40,300&family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main>
+        <div class="box">
+            <section class="output">
+                <input type="text" class="display">
+            </section>
+            <section class="input">
+                <button class="number button" value="7">7</button>
+                <button class="number button" value="8">8</button>
+                <button class="number button" value="9">9</button>
+                <button type="reset" id="reset" class="number" value="AC">AC</button>
+                <button class="number" id="delete">del</button>
+                <button class="number button" value="4">4</button>
+                <button class="number button" value="5">5</button>
+                <button class="number button" value="6">6</button>
+                <button class="action multi button" value="*">*</button>
+                <button class="action button" value="/">/</button>
+                <button class="number button" value="1">1</button>
+                <button class="number button" value="2">2</button>
+                <button class="number button" value="3">3</button>
+                <button class="action button" value="-">-</button>
+                <button class="action button" value="+" id="plus">+</button>
+                <button class="number button" value=".">.</button>
+                <button class="number button" value="0">0</button>
+                <button class="action button" value="=" id="equal" onclick="sendExpression();">=</button>
+            </section>
+        </div>
+    </main>
+    <script>
+        // Получаем все кнопки с классом "myButton"
+        var buttons = document.querySelectorAll(".button");
+
+        // Добавляем обработчик события "click" для каждой кнопки
+        var value = [];
+        var display = document.querySelector('.display');
+        buttons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            value.push(button.value);
+            display.value = value.join("");
+        });
+        });
+        var deleteBtn = document.getElementById('delete');
+        deleteBtn.addEventListener('click', function(event){
+            value.pop();
+            display.value = value.join("");
+        });
+        var resetBtn = document.getElementById('reset');
+        resetBtn.addEventListener('click', function(event){
+            value = [];
+            display.value =value.join("");
+        });
+
+        function sendExpression(){
+            var requestExpression = {
+            expression: display.value
+            };
+            console.log('Expression was sent:' + JSON.stringify(requestExpression));
+            fetch('/calc', {
+                method: 'POST',
+                body: JSON.stringify(requestExpression),
+                headers: new Headers({
+                    'Content-Type': 'application/json'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                display.value = data.result;
+            })
+        }
+    </script>
+</body>
+</html>
